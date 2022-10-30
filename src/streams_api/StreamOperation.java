@@ -1,8 +1,8 @@
 package streams_api;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import util.Product;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,10 +17,64 @@ public class StreamOperation {
 
         collectStream();
         groupByStream();
+        collectingAndThenStream();
+        partitionStream();
+        parallelStream();
 
     }
 
+    /***
+     *
+     */
+
+    private static void parallelStream() {
+        List<String> strNumbers = new ArrayList<>();
+        strNumbers.add("1");
+        strNumbers.add("2");
+        strNumbers.add("3");
+        strNumbers.add("4");
+        strNumbers.add("5");
+        strNumbers.add("6");
+        strNumbers.add("7");
+        strNumbers.add("8");
+        strNumbers.add("9");
+        strNumbers.add("10");
+        Stream<String> strNumStream = strNumbers.parallelStream();
+        System.out.println("Parallel Stream");
+        strNumStream.forEach(System.out::println);
+    }
+
+    /*
+    * PartitionBy được sử dụng khi chúng ta muốn chia một tập hợp dựa trên predicate nhất định thành các phân vùng.
+    * Nếu như filter chỉ lọc được những giá trị thoả mãn 1 predicate thì partitionBy lọc và chia ra
+    * các phân vùng thoả mãn và k thoả mãn
+    * */
+    private static void partitionStream() {
+        List<Product> productList = Arrays.asList(new Product("Apple", 1200), new Product("Samsung", 1000),
+                new Product("Nokia", 800), new Product("BlackBerry", 1000), new Product("Apple Pro Max", 1500),
+                new Product("Mi", 800), new Product("OnePlus", 1000));
+        Map<Boolean, List<Product>> partition = productList.stream()
+                                            .collect(Collectors.partitioningBy(e -> e.getPrice() >= 1000));
+        System.out.println("Partition: " + partition);
+    }
+
+    private static void collectingAndThenStream() {
+        List<Product> productList = Arrays.asList(new Product("Apple", 1200), new Product("Samsung", 1000),
+                new Product("Nokia", 800), new Product("BlackBerry", 1000), new Product("Apple Pro Max", 1500),
+                new Product("Mi", 800), new Product("OnePlus", 1000));
+
+        String maxPriceProduct = productList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(Product::getPrice)),
+                        (product) -> product.isPresent()? product.get().getName(): "None"));
+        System.out.println("Max price Product is: " + maxPriceProduct);
+    }
+
     private static void groupByStream() {
+        List<Product> productList = Arrays.asList(new Product("Apple", 1200), new Product("Samsung", 1000),
+                new Product("Nokia", 800), new Product("BlackBerry", 1000), new Product("Apple Pro Max", 1500),
+                new Product("Mi", 800), new Product("OnePlus", 1000));
+        Map<Integer, List<Product>> groupByPrice = productList.stream().collect(Collectors.groupingBy(Product::getPrice));
+        System.out.println("Product group by price: " + groupByPrice);
     }
 
     private static void collectStream() {
